@@ -10,7 +10,8 @@
 #import "SYPhotoListCell.h"
 #import "SYPhotoBrower.h"
 #import "UIImageView+WebCache.h"
-
+#import "YYKit.h"
+#import "YYPhotoGroupView.h"
 static NSString *const cellID = @"cellID";
 #define ScreenWidth [UIScreen mainScreen].bounds.size.width
 
@@ -78,11 +79,31 @@ static NSString *const cellID = @"cellID";
 
 -(void)collectionView:(UICollectionView *)collectionView didSelectItemAtIndexPath:(NSIndexPath *)indexPath{
 
-    SYPhotoBrower *brower =[[SYPhotoBrower alloc]init];
-    brower.delegate = self;
-    brower.currentIndex = indexPath.row; //传入当前点击的图片索引
-    brower.imagesCount = self.dataArray.count; //传入总的图片个数
-    [brower sy_showPhotoBrwer];
+//    SYPhotoBrower *brower =[[SYPhotoBrower alloc]init];
+//    brower.delegate = self;
+//    brower.currentIndex = indexPath.row; //传入当前点击的图片索引
+//    brower.imagesCount = self.dataArray.count; //传入总的图片个数
+//    [brower sy_showPhotoBrwer];
+    
+    UIView *fromView = nil;
+    NSMutableArray *items =[[NSMutableArray alloc]init];
+    for (int i =0; i<self.dataArray.count; i++) {
+        
+        YYPhotoGroupItem *item = [YYPhotoGroupItem new];
+        SYPhotoListCell *cell = (SYPhotoListCell *)[self.collectionView cellForItemAtIndexPath:indexPath];
+        item.thumbView = cell.img;
+        item.largeImageURL = [NSURL URLWithString:self.dataArray[i]];
+        item.largeImageSize  = self.view.bounds.size;
+        [items addObject:item];
+        if (i==indexPath.row) {
+            fromView = cell.img;
+        }
+    }
+    
+    SYPhotoListCell *cell = (SYPhotoListCell *)[self.collectionView cellForItemAtIndexPath:indexPath];
+    YYPhotoGroupView *v = [[YYPhotoGroupView alloc]initWithGroupItems:items];
+    [v presentFromImageView:cell.img toContainer:self.view animated:YES completion:nil];
+    
 }
 
 #pragma mark - SYPhotoBrowerDelegate
